@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: metricbeat
+  name: metricbeat
+  namespace: openshift-user-workload-monitoring
+spec:
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: 5066-5066
+    port: 5066
+    protocol: TCP
+    targetPort: 5066
+  - name: 9201-9201
+    port: 9201
+    protocol: TCP
+    targetPort: 9201
+  selector:
+    app: metricbeat
+  type: ClusterIP

@@ -1,0 +1,7 @@
+infra_logs_index: ocp-pocp-logs-infra-write
+audit_logs_index: ocp-pocp-logs-audit-write
+app_logs_index: ocp-pocp-logs-app-write
+host: <ELASTIC_HOST>
+port: 9200
+user: <Elastic_LOGIN_USER>
+password: <ELASTIC_LOGIN_PASSWORD>

@@ -1,0 +1,9 @@
+image: docker.elastic.co/beats/metricbeat:8.3.3
+ocp: pocp
+elasticsearch:
+  host: <URL>
+  username: <Username>
+  password: <PASSWORD>
+  index: ocp-pocp-metrics-infra-write
+  policy:
+    duration: 3d

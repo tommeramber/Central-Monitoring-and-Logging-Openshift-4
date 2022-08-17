@@ -1,0 +1,13 @@
+image: <metricbeat_image_path>:<LABEL>
+metricbeat_cm:
+  loglevel: info
+  elasticsearch:
+    host: <host>
+    username: <username>
+    password: <password>
+    # Change the pocp to the relevant cluster
+    index: "ocp-pocp-metrics-apps-write"
+    port: 9200
+    # Change the pocp to the relevant cluster
+    # Change the CHANGEME based on the value you configured in the Elasticsearch policy
+    policy_name: ocp_pocp_rollover_policy_CHANGEME

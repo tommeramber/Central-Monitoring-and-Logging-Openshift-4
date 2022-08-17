@@ -1,0 +1,29 @@
+apiVersion: v1
+data:
+  metricbeat.yml: |
+    metricbeat.config.modules:
+      path: ${path.config}/modules.d/*.yml
+      reload.enabled: false
+    setup.template.enabled: false
+    setup.template.settings:
+      index.number_of_shards: 1
+      index.codec: best_compression
+    max_procs: 1
+    setup.template.enabled: true
+    setup.ilm.enabled: true 
+    setup.ilm.rollover_alias: {{ .Values.metricbeat_cm.elasticsearch.index }}
+    setup.ilm.policy_name: {{ .Values.metricbeat_cm.elasticsearch.policy_name }}
+    output.elasticsearch:
+      hosts: ["{{ .Values.metricbeat_cm.elasticsearch.host }}:{{ .Values.metricbeat_cm.elasticsearch.port }}"]
+      index: {{ .Values.metricbeat_cm.elasticsearch.index }}
+      username: "{{ .Values.metricbeat_cm.elasticsearch.username }}"
+      password: "{{ .Values.metricbeat_cm.elasticsearch.password }}"
+      compression_level: 9
+    logging.to_stderr: true
+    logging.level: {{ .Values.metricbeat_cm.loglevel }}
+    http.enabled: true
+    http.port: 5066
+kind: ConfigMap
+metadata:
+  name: metricbeat
+  namespace: openshift-user-workload-monitoring

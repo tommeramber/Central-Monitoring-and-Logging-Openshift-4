@@ -1,0 +1,63 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: metricbeat
+  namespace: openshift-user-workload-monitoring
+  labels:
+    app: metricbeat
+spec:
+  minReadySeconds: 0
+  paused: false
+  replicas: 1
+  template:
+    metadata: 
+      labels:
+        app: metricbeat
+    spec:
+      containers:
+      - name: metricbeat
+        image: {{ .Values.image }}
+        command: ["/usr/share/metricbeat/bin/metricbeat"]
+        args: ["-c", "/etc/metricbeat/metricbeat.yml", "-path.home", "/usr/share/metricbeat", "-path.config", "/etc/metricbeat", "-path.data", "/var/lib/metricbeat", "-path.logs", "/var/log/metricbeat"]
+        volumeMounts:
+        - mountPath: /etc/metricbeat/metricbeat.yml
+          name: metricbeat
+          subPath: metricbeat.yml
+        - mountPath: /etc/metricbeat/modules.d/prometheus.yml
+          name: prometheus
+          subPath: prometheus.yml
+        ports:
+          - containerPort: 5066
+            name: web
+            protocol: TCP
+          - containerPort: 9201
+            name: remote
+            protocol: TCP
+        livenessProbe:
+          exec:
+            command:
+              - sh
+              - -c
+              - |
+                #!/usr/bin/env bash -e
+                metricbeat test output
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+      volumes:
+      - name: metricbeat
+        configMap:
+          name: metricbeat
+      - name: prometheus
+        configMap:
+          name: prometheus
+      serviceAccount: metricbeat
+      serviceAccountName: metricbeat
+  triggers:
+  - type: ConfigChange
+  strategy:
+    type: Rolling
+  paused: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 0

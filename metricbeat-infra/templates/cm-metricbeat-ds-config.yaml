@@ -1,0 +1,72 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metricbeat-daemonset-config
+  namespace: openshift-metricbeat-infra-daemonset
+  labels:
+    k8s-app: metricbeat
+data:
+  metricbeat.yml: |-
+    metricbeat.config.modules:
+      # Mounted `metricbeat-daemonset-modules` configmap:
+      path: ${path.config}/modules.d/*.yml
+      # Reload module configs as they change:
+      reload.enabled: false
+    
+    setup.template.enabled: false
+    setup.template.settings:
+      index.number_of_shards: 1
+      index.codec: best_compression
+
+    max_procs: 1
+
+    setup.ilm.enabled: auto
+    setup.ilm.rollver_alias: {{ .Values.elasticsearch.index }}
+    setup.ilm.policy_name: ocp_{{ .Values.ocp }}_rollover_policy_{{ .Values.elasticsearch.policy.duration }}
+
+    metricbeat.autodiscover:
+      providers:
+        - type: kubernetes
+          scope: cluster
+          node: ${NODE_NAME}
+          unique: true
+          templates:
+            - config:
+                - module: kubernetes
+                  hosts: ["kube-state-metrics.openshift-monitoring:8443"]
+                  period: 10s
+                  add_metadata: true
+                  metricsets:
+                    - state_node
+                    - state_deployment
+                    - state_daemonset
+                    - state_replicaset
+                    - state_pod
+                    - state_container
+                    - state_job
+                    - state_cronjob
+                    - state_resourcequota
+                    - state_statefulset
+                    - state_service
+                - module: kubernetes
+                  metricsets:
+                    - apiserver
+                  hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+                  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+                  ssl.certificate_authorities:
+                    - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+                  period: 30s
+
+    processors:
+      - add_cloud_metadata:
+    
+    http.enabled: true
+    http.port: 5066
+
+    output.elasticsearch:
+      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      username: ${ELASTICSEARCH_USERNAME}
+      password: ${ELASTICSEARCH_PASSWORD}
+      index: "${ELASTICSEARCH_INDEX}"
+      compression_level: 9

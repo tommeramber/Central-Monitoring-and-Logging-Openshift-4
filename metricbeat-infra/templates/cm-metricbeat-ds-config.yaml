@@ -68,5 +68,5 @@ data:
       hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
-      index: "${ELASTICSEARCH_INDEX}"
+      index: "{ELASTICSEARCH_INDEX}"
       compression_level: 9

@@ -351,8 +351,9 @@ To install my helm chart you'll need to clone this repo and run the following:
 > Edit the relevant variables in the [values.yaml](./metricbeat-infra/values.yaml) file in the chart so it'll match your environment.
 ```bash
 oc create ns openshift-metricbeat-infra-daemonset
+oc project openshift-metricbeat-infra-daemonset
 cd metricbeat-infra
-helm install metricbeat-infra .
+helm install metricbeat-infra . -n openshift-metricbeat-infra-daemonset
 ```
 
 Verification:
@@ -397,7 +398,7 @@ First, build the Dockerfile in the directory [metricbeat-deployment-image](./met
 Then, go to the [metricbeat-user-workloads](./metricbeat-user-workloads/) directory and run the following commands:
 > NOTE! Edit the [values.yaml](./metricbeat-user-workloads/values.yaml) file before you install the helm chart to correspond with your values
 ```bash
-helm install metricbeat-user-workload . -f values.yaml
+helm install metricbeat-user-workload . -f values.yaml -n openshift-user-workload-monitoring
 ```
 
 Verify
@@ -425,6 +426,12 @@ data:
         - url: "http://metricbeat.openshift-user-workload-monitoring.svc.cluster.local:9201/write"
           tlsConfig:
             insecure_skip_verify: true
+```
+Now you need to scale the existing prometheus pods down to 0, don't worry due, the Openshift-Monitoring operator will generate two new instances for you automaticly, and they will have the new configuration we just created.
+```bash
+oc scale --replicas=0 statefulset prometheus-user-workload -n openshift-user-workload-monitoring
+# Optional if you don't want to wait
+oc scale --replicas=2 statefulset prometheus-user-workload -n openshift-user-workload-monitoring
 ```
 
 Finaly, go to Elasticsearch -> `Dev Tools` page and test the index:

@@ -457,7 +457,7 @@ oc create namespace openshift-logging
 # Red Hat Solution #6165332
 oc label namespace openshift-logging openshift.io/cluster-monitoring="true"
 ```
-### 1 Install Openshift Logging Operator
+### 1 Install Openshift Logging Operator + Elasticsearch Operator
 Via Openshift OperatorHub. 
 > In case of disconnected network, you'll need to import it to Openshift. 
 ### 2 Generate Clusterlogging instance

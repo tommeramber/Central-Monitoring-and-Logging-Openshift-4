@@ -352,8 +352,9 @@ To install my helm chart you'll need to clone this repo and run the following:
 ```bash
 oc create ns openshift-metricbeat-infra-daemonset
 oc project openshift-metricbeat-infra-daemonset
+oc adm policy add-scc-to-user privileged -z metricbeat -n openshift-metricbeat-infra-daemonset
 cd metricbeat-infra
-helm install metricbeat-infra . -n openshift-metricbeat-infra-daemonset
+helm install metricbeat-infra . -f values.yaml -n openshift-metricbeat-infra-daemonset
 ```
 
 Verification:

@@ -95,7 +95,7 @@ PUT _ilm/policy/ocp_pocp_rollover_policy_CHANGEME
         }
       },
       "delete" : {
-        "min_age" : "CHANGEME",
+        "min_age" : "CHANGEME+1",
         "actions" : {
           "delete" : {}
         }

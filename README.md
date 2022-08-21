@@ -352,8 +352,9 @@ To install my helm chart you'll need to clone this repo and run the following:
 ```bash
 oc create ns openshift-metricbeat-infra-daemonset
 oc project openshift-metricbeat-infra-daemonset
+oc adm policy add-scc-to-user privileged -z metricbeat -n openshift-metricbeat-infra-daemonset
 cd metricbeat-infra
-helm install metricbeat-infra . -n openshift-metricbeat-infra-daemonset
+helm install metricbeat-infra . -f values.yaml -n openshift-metricbeat-infra-daemonset
 ```
 
 Verification:
@@ -456,7 +457,7 @@ oc create namespace openshift-logging
 # Red Hat Solution #6165332
 oc label namespace openshift-logging openshift.io/cluster-monitoring="true"
 ```
-### 1 Install Openshift Logging Operator
+### 1 Install Openshift Logging Operator + Elasticsearch Operator
 Via Openshift OperatorHub. 
 > In case of disconnected network, you'll need to import it to Openshift. 
 ### 2 Generate Clusterlogging instance
